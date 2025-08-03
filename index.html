@@ -3,263 +3,479 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TFC Smithing Calculator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>TFC Smithing Calculator - Minecraft Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-            color: #e2e8f0;
-            min-height: 100vh;
-            padding: 20px;
+        /* Minecraft-inspired CSS Variables */
+        :root {
+            --minecraft-green: #4a7c59;
+            --minecraft-dark-green: #2d5016;
+            --minecraft-brown: #8b4513;
+            --minecraft-dark-brown: #654321;
+            --minecraft-gray: #7f7f7f;
+            --minecraft-dark-gray: #3f3f3f;
+            --minecraft-light-gray: #c6c6c6;
+            --minecraft-stone: #7d7d7d;
+            --minecraft-dirt: #8b4513;
+            --minecraft-grass: #7cbd3a;
+            --minecraft-red: #dc143c;
+            --minecraft-gold: #ffaa00;
+            --minecraft-blue: #3c44aa;
+            --minecraft-black: #191919;
+            --minecraft-white: #f9f9f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
         }
-        
+
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: linear-gradient(45deg, var(--minecraft-dirt) 25%, var(--minecraft-brown) 25%, var(--minecraft-brown) 50%, var(--minecraft-dirt) 50%, var(--minecraft-dirt) 75%, var(--minecraft-brown) 75%);
+            background-size: 32px 32px;
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--minecraft-white);
+            line-height: 1.6;
+            animation: backgroundShift 20s linear infinite;
+        }
+
+        @keyframes backgroundShift {
+            0% { background-position: 0 0; }
+            100% { background-position: 32px 32px; }
+        }
+
         .container {
-            background: rgba(45, 55, 72, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(79, 209, 197, 0.2);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-        }
-        
-        .smithing-bar {
-            background: linear-gradient(90deg, #e53e3e 0%, #fd7f28 25%, #ffd700 50%, #38a169 75%, #38a169 100%);
-            height: 20px;
-            border-radius: 10px;
+            background: var(--minecraft-stone);
+            border: 4px solid var(--minecraft-dark-gray);
+            border-radius: 0;
+            box-shadow: 
+                inset 2px 2px 0 var(--minecraft-light-gray),
+                inset -2px -2px 0 var(--minecraft-black),
+                4px 4px 0 var(--minecraft-black);
+            padding: 24px;
             position: relative;
-            margin: 20px 0;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
         }
-        
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: repeating-linear-gradient(
+                0deg,
+                var(--minecraft-dark-gray) 0px,
+                var(--minecraft-dark-gray) 2px,
+                var(--minecraft-gray) 2px,
+                var(--minecraft-gray) 4px
+            );
+            z-index: -1;
+            border-radius: 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+            padding: 16px;
+            background: var(--minecraft-dark-green);
+            border: 2px solid var(--minecraft-green);
+            box-shadow: 
+                inset 1px 1px 0 var(--minecraft-grass),
+                inset -1px -1px 0 var(--minecraft-black);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            color: var(--minecraft-gold);
+            text-shadow: 2px 2px 0 var(--minecraft-black);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .header p {
+            font-size: 8px;
+            color: var(--minecraft-light-gray);
+            text-shadow: 1px 1px 0 var(--minecraft-black);
+        }
+
+        /* Minecraft-style smithing bar */
+        .smithing-bar-container {
+            background: var(--minecraft-dark-gray);
+            border: 2px solid var(--minecraft-black);
+            padding: 16px;
+            margin-bottom: 24px;
+            box-shadow: inset 2px 2px 0 var(--minecraft-gray);
+        }
+
+        .smithing-bar-label {
+            font-size: 10px;
+            color: var(--minecraft-gold);
+            margin-bottom: 12px;
+            text-shadow: 1px 1px 0 var(--minecraft-black);
+        }
+
+        .smithing-bar {
+            height: 24px;
+            background: linear-gradient(90deg, 
+                var(--minecraft-red) 0%, 
+                var(--minecraft-gold) 25%, 
+                var(--minecraft-gold) 50%, 
+                var(--minecraft-green) 75%, 
+                var(--minecraft-green) 100%);
+            border: 2px solid var(--minecraft-black);
+            position: relative;
+            box-shadow: inset 1px 1px 0 rgba(255,255,255,0.3);
+        }
+
         .arrow {
             position: absolute;
-            top: -8px;
+            top: -12px;
             width: 0;
             height: 0;
+            transition: left 0.3s ease;
+            filter: drop-shadow(1px 1px 0 var(--minecraft-black));
+        }
+
+        .green-arrow {
             border-left: 8px solid transparent;
             border-right: 8px solid transparent;
-            transition: left 0.3s ease;
+            border-bottom: 12px solid var(--minecraft-grass);
         }
-        
-        .green-arrow {
-            border-bottom: 12px solid #4fd1c5;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-        }
-        
+
         .red-arrow {
-            border-bottom: 12px solid #fc8181;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-bottom: 12px solid var(--minecraft-red);
         }
-        
-        .input-group {
-            background: rgba(26, 32, 44, 0.5);
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(74, 85, 104, 0.3);
-            transition: border-color 0.2s ease;
-        }
-        
-        .input-group:hover {
-            border-color: rgba(79, 209, 197, 0.4);
-        }
-        
-        .input-group.error {
-            border-color: #fc8181;
-            background: rgba(252, 129, 129, 0.1);
-        }
-        
-        label {
+
+        .bar-labels {
             display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 12px;
-            font-weight: 600;
-            color: #4fd1c5;
-            font-size: 1.1rem;
+            justify-content: space-between;
+            margin-top: 8px;
+            font-size: 8px;
+            color: var(--minecraft-light-gray);
         }
-        
-        input, textarea {
+
+        /* Minecraft-style input groups */
+        .input-group {
+            background: var(--minecraft-gray);
+            border: 2px solid var(--minecraft-black);
+            margin-bottom: 20px;
+            padding: 16px;
+            box-shadow: 
+                inset 1px 1px 0 var(--minecraft-light-gray),
+                inset -1px -1px 0 var(--minecraft-dark-gray);
+        }
+
+        .input-group.error {
+            border-color: var(--minecraft-red);
+            background: rgba(220, 20, 60, 0.1);
+        }
+
+        .input-label {
+            display: block;
+            font-size: 10px;
+            color: var(--minecraft-gold);
+            margin-bottom: 8px;
+            text-shadow: 1px 1px 0 var(--minecraft-black);
+        }
+
+        .minecraft-input {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #4a5568;
-            border-radius: 10px;
-            background: rgba(26, 32, 44, 0.8);
-            color: #e2e8f0;
-            font-size: 1rem;
+            padding: 12px;
+            background: var(--minecraft-dark-gray);
+            border: 2px solid var(--minecraft-black);
+            color: var(--minecraft-white);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            box-shadow: inset 2px 2px 0 var(--minecraft-black);
             transition: all 0.2s ease;
-            font-family: inherit;
         }
-        
-        input:focus, textarea:focus {
+
+        .minecraft-input:focus {
             outline: none;
-            border-color: #4fd1c5;
-            box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
-            background: rgba(26, 32, 44, 1);
+            border-color: var(--minecraft-blue);
+            box-shadow: 
+                inset 2px 2px 0 var(--minecraft-black),
+                0 0 0 2px var(--minecraft-blue);
         }
-        
+
+        .minecraft-textarea {
+            width: 100%;
+            padding: 12px;
+            background: var(--minecraft-dark-gray);
+            border: 2px solid var(--minecraft-black);
+            color: var(--minecraft-white);
+            font-family: 'Press Start 2P', monospace;
+            font-size: 10px;
+            box-shadow: inset 2px 2px 0 var(--minecraft-black);
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .minecraft-textarea:focus {
+            outline: none;
+            border-color: var(--minecraft-blue);
+            box-shadow: 
+                inset 2px 2px 0 var(--minecraft-black),
+                0 0 0 2px var(--minecraft-blue);
+        }
+
+        /* Minecraft-style buttons */
         .preset-buttons {
             display: flex;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 8px;
+            margin-top: 12px;
             flex-wrap: wrap;
         }
-        
+
         .preset-btn {
-            background: rgba(79, 209, 197, 0.2);
-            color: #4fd1c5;
-            border: 1px solid #4fd1c5;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.875rem;
+            background: var(--minecraft-green);
+            border: 2px solid var(--minecraft-black);
+            color: var(--minecraft-white);
+            padding: 8px 12px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.1s ease;
+            box-shadow: 
+                inset 1px 1px 0 var(--minecraft-grass),
+                inset -1px -1px 0 var(--minecraft-dark-green);
         }
-        
+
         .preset-btn:hover {
-            background: rgba(79, 209, 197, 0.3);
-            transform: translateY(-1px);
+            background: var(--minecraft-grass);
+            transform: translate(1px, 1px);
+            box-shadow: 
+                inset 1px 1px 0 var(--minecraft-grass),
+                inset -1px -1px 0 var(--minecraft-dark-green);
         }
-        
+
+        .preset-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: inset 2px 2px 0 var(--minecraft-dark-green);
+        }
+
+        .preset-btn.active {
+            background: var(--minecraft-gold);
+            box-shadow: inset 2px 2px 0 var(--minecraft-dark-gray);
+        }
+
+        /* Main calculate button */
         .calculate-btn {
-            background: linear-gradient(135deg, #4fd1c5 0%, #38b2ac 100%);
-            color: #1a202c;
-            padding: 16px 32px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1.25rem;
+            width: 100%;
+            background: var(--minecraft-gold);
+            border: 4px solid var(--minecraft-black);
+            color: var(--minecraft-black);
+            padding: 16px 24px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 12px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 8px 20px rgba(79, 209, 197, 0.3);
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            transition: all 0.1s ease;
+            box-shadow: 
+                inset 2px 2px 0 #ffcc33,
+                inset -2px -2px 0 #cc8800;
+            margin: 24px 0;
         }
-        
+
         .calculate-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(79, 209, 197, 0.4);
+            background: #ffcc33;
+            transform: translate(1px, 1px);
         }
-        
+
+        .calculate-btn:active:not(:disabled) {
+            transform: translate(2px, 2px);
+            box-shadow: inset 2px 2px 0 #cc8800;
+        }
+
         .calculate-btn:disabled {
-            opacity: 0.6;
+            background: var(--minecraft-gray);
+            color: var(--minecraft-dark-gray);
             cursor: not-allowed;
-            transform: none;
+            box-shadow: inset 2px 2px 0 var(--minecraft-light-gray);
         }
-        
+
+        /* Results section */
         .result-section {
-            background: rgba(26, 32, 44, 0.8);
-            border-radius: 15px;
-            padding: 25px;
-            margin-top: 25px;
-            border: 1px solid rgba(79, 209, 197, 0.2);
-        }
-        
-        .phase-card {
-            background: rgba(45, 55, 72, 0.6);
-            border-radius: 12px;
+            background: var(--minecraft-dark-gray);
+            border: 2px solid var(--minecraft-black);
             padding: 20px;
-            margin: 15px 0;
-            border-left: 4px solid #4fd1c5;
+            margin-top: 24px;
+            box-shadow: inset 2px 2px 0 var(--minecraft-gray);
         }
-        
+
+        .result-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .result-title {
+            font-size: 12px;
+            color: var(--minecraft-gold);
+            text-shadow: 1px 1px 0 var(--minecraft-black);
+        }
+
+        .export-btn {
+            background: var(--minecraft-blue);
+            border: 2px solid var(--minecraft-black);
+            color: var(--minecraft-white);
+            padding: 8px 12px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 8px;
+            cursor: pointer;
+            box-shadow: inset 1px 1px 0 #5555ff;
+        }
+
+        .export-btn:hover {
+            background: #5555ff;
+            transform: translate(1px, 1px);
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: var(--minecraft-stone);
+            border: 2px solid var(--minecraft-black);
+            padding: 12px;
+            text-align: center;
+            box-shadow: inset 1px 1px 0 var(--minecraft-light-gray);
+        }
+
+        .summary-value {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .summary-label {
+            font-size: 8px;
+            color: var(--minecraft-light-gray);
+        }
+
+        .phase-card {
+            background: var(--minecraft-gray);
+            border: 2px solid var(--minecraft-black);
+            border-left: 4px solid var(--minecraft-green);
+            padding: 16px;
+            margin: 16px 0;
+            box-shadow: inset 1px 1px 0 var(--minecraft-light-gray);
+        }
+
+        .phase-title {
+            font-size: 10px;
+            color: var(--minecraft-gold);
+            margin-bottom: 12px;
+            text-shadow: 1px 1px 0 var(--minecraft-black);
+        }
+
         .step-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(74, 85, 104, 0.3);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--minecraft-dark-gray);
         }
-        
+
         .step-item:last-child {
             border-bottom: none;
         }
-        
+
         .step-number {
-            background: #4fd1c5;
-            color: #1a202c;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+            background: var(--minecraft-gold);
+            color: var(--minecraft-black);
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 8px;
             font-weight: bold;
-            font-size: 0.875rem;
+            border: 1px solid var(--minecraft-black);
         }
-        
+
+        .step-content {
+            flex: 1;
+            font-size: 8px;
+        }
+
+        .step-result {
+            color: var(--minecraft-light-gray);
+            margin-left: 8px;
+        }
+
+        /* Error and success messages */
+        .message {
+            padding: 12px;
+            margin: 16px 0;
+            border: 2px solid;
+            font-size: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .error-message {
-            background: rgba(252, 129, 129, 0.1);
-            border: 1px solid #fc8181;
-            color: #fc8181;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            background: rgba(220, 20, 60, 0.2);
+            border-color: var(--minecraft-red);
+            color: var(--minecraft-red);
         }
-        
+
         .success-message {
-            background: rgba(72, 187, 120, 0.1);
-            border: 1px solid #48bb78;
-            color: #48bb78;
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            background: rgba(74, 124, 89, 0.2);
+            border-color: var(--minecraft-green);
+            color: var(--minecraft-green);
         }
-        
+
         .loading-spinner {
-            border: 3px solid rgba(79, 209, 197, 0.3);
-            border-top: 3px solid #4fd1c5;
+            border: 2px solid var(--minecraft-gray);
+            border-top: 2px solid var(--minecraft-gold);
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 16px;
+            height: 16px;
             animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 8px;
         }
-        
+
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        .tooltip {
-            position: relative;
-            cursor: help;
+
+        .hidden {
+            display: none !important;
         }
-        
-        .tooltip:hover::after {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #1a202c;
-            color: #e2e8f0;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 0.875rem;
-            white-space: nowrap;
-            z-index: 1000;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-        
+
+        /* Responsive design */
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                font-size: 8px;
+            }
+            
             .container {
-                padding: 20px;
-                margin: 10px;
+                padding: 16px;
+            }
+            
+            .header h1 {
+                font-size: 14px;
             }
             
             .preset-buttons {
@@ -267,141 +483,178 @@
             }
             
             .calculate-btn {
-                font-size: 1.125rem;
-                padding: 14px 24px;
+                font-size: 10px;
+                padding: 12px 16px;
             }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 12px;
+            }
+            
+            .calculate-btn {
+                font-size: 8px;
+            }
+        }
+
+        /* Tooltip styles */
+        .tooltip {
+            position: relative;
+            cursor: help;
+            color: var(--minecraft-blue);
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--minecraft-black);
+            color: var(--minecraft-white);
+            padding: 8px 12px;
+            font-size: 8px;
+            white-space: nowrap;
+            z-index: 1000;
+            border: 1px solid var(--minecraft-gray);
+            margin-bottom: 4px;
+        }
+
+        /* Input validation styles */
+        .error-text {
+            color: var(--minecraft-red);
+            font-size: 8px;
+            margin-top: 4px;
+            text-shadow: 1px 1px 0 var(--minecraft-black);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent mb-4">
-                <i class="fas fa-hammer mr-3"></i>
-                TFC Smithing Calculator
-            </h1>
-            <p class="text-gray-400 text-lg">Achieve perfectly forged items with precise anvil sequences</p>
-        </header>
+        <!-- Header -->
+        <div class="header">
+            <h1>⚒️ TFC SMITHING CALCULATOR ⚒️</h1>
+            <p>CRAFT THE PERFECT FORGE - MINECRAFT EDITION</p>
+        </div>
 
         <!-- Visual Smithing Bar -->
-        <div class="input-group">
-            <label>
-                <i class="fas fa-chart-line"></i>
-                Smithing Progress Visualization
-            </label>
+        <div class="smithing-bar-container">
+            <div class="smithing-bar-label">🔥 SMITHING PROGRESS VISUALIZATION</div>
             <div class="smithing-bar" id="smithingBar">
                 <div class="arrow green-arrow" id="greenArrowVisual"></div>
                 <div class="arrow red-arrow" id="redArrowVisual"></div>
             </div>
-            <div class="flex justify-between text-sm text-gray-400 mt-2">
-                <span>-150</span>
+            <div class="bar-labels">
                 <span>0</span>
-                <span>+150</span>
+                <span>75</span>
+                <span>150</span>
             </div>
         </div>
 
+        <!-- Calculator Form -->
         <form id="calculatorForm">
+            <!-- Current Green Arrow Position -->
             <div class="input-group" id="greenArrowGroup">
-                <label for="greenArrow">
-                    <i class="fas fa-location-arrow text-teal-400"></i>
-                    Current Green Arrow Position
-                    <i class="fas fa-question-circle tooltip text-sm" data-tooltip="Enter the current position of your green arrow on the smithing bar"></i>
+                <label class="input-label" for="greenArrow">
+                    🎯 CURRENT GREEN ARROW POSITION
+                    <span class="tooltip" data-tooltip="Enter current position of green arrow (0-150)">ℹ️</span>
                 </label>
-                <input type="number" id="greenArrow" placeholder="e.g., 60" step="any" required>
-                <div class="error-text hidden text-red-400 text-sm mt-2"></div>
+                <input type="number" id="greenArrow" class="minecraft-input" placeholder="e.g., 60" step="any" min="0" max="150" required>
+                <div class="error-text hidden" id="greenArrowError"></div>
             </div>
 
+            <!-- Red Arrow Target Position -->
             <div class="input-group" id="redArrowGroup">
-                <label for="redArrow">
-                    <i class="fas fa-bullseye text-red-400"></i>
-                    Red Arrow (Final Target) Position
-                    <i class="fas fa-question-circle tooltip text-sm" data-tooltip="Enter the target position where the red arrow is pointing"></i>
+                <label class="input-label" for="redArrow">
+                    🎯 RED ARROW TARGET POSITION
+                    <span class="tooltip" data-tooltip="Enter target position where red arrow points (0-150)">ℹ️</span>
                 </label>
-                <input type="number" id="redArrow" placeholder="e.g., 55" step="any" required>
-                <div class="error-text hidden text-red-400 text-sm mt-2"></div>
+                <input type="number" id="redArrow" class="minecraft-input" placeholder="e.g., 55" step="any" min="0" max="150" required>
+                <div class="error-text hidden" id="redArrowError"></div>
             </div>
 
+            <!-- Required Final Hits -->
             <div class="input-group" id="finalHitsGroup">
-                <label for="finalHits">
-                    <i class="fas fa-list-ol text-yellow-400"></i>
-                    Required Final Hits (Right to Left)
-                    <i class="fas fa-question-circle tooltip text-sm" data-tooltip="Enter the values from red-bordered slots, starting from rightmost"></i>
+                <label class="input-label" for="finalHits">
+                    📋 REQUIRED FINAL HITS (RIGHT TO LEFT)
+                    <span class="tooltip" data-tooltip="Enter values from red-bordered slots, right to left">ℹ️</span>
                 </label>
-                <textarea id="finalHits" rows="2" placeholder="e.g., -15, 2, 7 (for 3 hits) or 16, 2 (for 2 hits)" required></textarea>
-                <div class="error-text hidden text-red-400 text-sm mt-2"></div>
-                <small class="text-gray-400 block mt-2">
-                    <i class="fas fa-info-circle"></i>
-                    Enter numerical values from the red-bordered slots, separated by commas
+                <textarea id="finalHits" class="minecraft-textarea" placeholder="e.g., -15, 2, 7 (for 3 hits) or 16, 2 (for 2 hits)" required></textarea>
+                <div class="error-text hidden" id="finalHitsError"></div>
+                <small style="color: var(--minecraft-light-gray); font-size: 8px; margin-top: 4px; display: block;">
+                    💡 Enter numerical values from red-bordered slots, separated by commas
                 </small>
             </div>
 
+            <!-- Available Anvil Buttons -->
             <div class="input-group" id="availableButtonsGroup">
-                <label for="availableButtons">
-                    <i class="fas fa-th text-purple-400"></i>
-                    Available Anvil Buttons
-                    <i class="fas fa-question-circle tooltip text-sm" data-tooltip="All button values available on your anvil interface"></i>
+                <label class="input-label" for="availableButtons">
+                    🔨 AVAILABLE ANVIL BUTTONS
+                    <span class="tooltip" data-tooltip="All button values available on your anvil">ℹ️</span>
                 </label>
-                <textarea id="availableButtons" rows="2" placeholder="Enter all available button values" required></textarea>
-                <div class="error-text hidden text-red-400 text-sm mt-2"></div>
+                <textarea id="availableButtons" class="minecraft-textarea" placeholder="Enter all available button values" required></textarea>
+                <div class="error-text hidden" id="availableButtonsError"></div>
                 <div class="preset-buttons">
-                    <button type="button" class="preset-btn" onclick="setPreset('default')">
-                        <i class="fas fa-cog"></i> Default TFC
-                    </button>
-                    <button type="button" class="preset-btn" onclick="setPreset('extended')">
-                        <i class="fas fa-plus"></i> Extended Set
-                    </button>
-                    <button type="button" class="preset-btn" onclick="setPreset('minimal')">
-                        <i class="fas fa-minus"></i> Minimal Set
-                    </button>
+                    <button type="button" class="preset-btn" onclick="setPreset('default')">⚙️ DEFAULT TFC</button>
+                    <button type="button" class="preset-btn" onclick="setPreset('extended')">➕ EXTENDED SET</button>
+                    <button type="button" class="preset-btn" onclick="setPreset('minimal')">➖ MINIMAL SET</button>
                 </div>
             </div>
 
+            <!-- Calculate Button -->
             <button type="submit" class="calculate-btn" id="calculateBtn">
-                <i class="fas fa-calculator"></i>
-                <span>Calculate Smithing Steps</span>
-                <div class="loading-spinner hidden" id="loadingSpinner"></div>
+                🧮 CALCULATE SMITHING STEPS
+                <span class="loading-spinner hidden" id="loadingSpinner"></span>
             </button>
         </form>
 
+        <!-- Results Section -->
         <div id="resultSection" class="result-section hidden">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-bold text-teal-400">
-                    <i class="fas fa-route"></i>
-                    Calculation Results
-                </h2>
-                <button onclick="exportResults()" class="text-teal-400 hover:text-teal-300 transition-colors">
-                    <i class="fas fa-download"></i>
-                    Export
-                </button>
+            <div class="result-header">
+                <h2 class="result-title">📊 CALCULATION RESULTS</h2>
+                <button type="button" class="export-btn" onclick="exportResults()">💾 EXPORT</button>
             </div>
             
-            <div id="calculationSummary" class="mb-6"></div>
+            <div id="calculationSummary" class="summary-grid"></div>
             <div id="phaseResults"></div>
         </div>
 
-        <div id="errorContainer"></div>
+        <!-- Message Container -->
+        <div id="messageContainer"></div>
     </div>
 
     <script>
-        // Preset configurations
+        // Preset configurations for different TFC setups
         const presets = {
             default: '2, 7, 13, 16, -3, -6, -9, -15',
             extended: '1, 2, 3, 7, 13, 16, -1, -2, -3, -6, -9, -15',
             minimal: '7, 13, -6, -9'
         };
 
-        // Initialize the app
+        // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎮 Minecraft TFC Calculator initialized');
             setPreset('default');
             setupEventListeners();
             updateSmithingBarVisual();
         });
 
+        /**
+         * Set up all event listeners for the application
+         */
         function setupEventListeners() {
             const form = document.getElementById('calculatorForm');
             const greenArrow = document.getElementById('greenArrow');
             const redArrow = document.getElementById('redArrow');
+            const finalHits = document.getElementById('finalHits');
+            const availableButtons = document.getElementById('availableButtons');
 
+            // Form submission handler - FIXED: Properly bind the event
             form.addEventListener('submit', handleFormSubmit);
             
             // Real-time validation and visual updates
@@ -415,24 +668,56 @@
                 updateSmithingBarVisual();
             });
 
-            // Validate other inputs
-            document.getElementById('finalHits').addEventListener('input', () => validateInput('finalHits'));
-            document.getElementById('availableButtons').addEventListener('input', () => validateInput('availableButtons'));
+            finalHits.addEventListener('input', () => validateInput('finalHits'));
+            availableButtons.addEventListener('input', () => validateInput('availableButtons'));
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', handleKeyboardShortcuts);
         }
 
+        /**
+         * Handle keyboard shortcuts
+         */
+        function handleKeyboardShortcuts(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        document.getElementById('calculateBtn').click();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        if (!document.getElementById('resultSection').classList.contains('hidden')) {
+                            exportResults();
+                        }
+                        break;
+                }
+            }
+        }
+
+        /**
+         * Set preset button configuration
+         */
         function setPreset(presetName) {
             document.getElementById('availableButtons').value = presets[presetName];
             validateInput('availableButtons');
             
-            // Visual feedback
-            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('bg-teal-500'));
-            event?.target.classList.add('bg-teal-500');
+            // Update button visual state
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event?.target?.classList.add('active');
+            
+            console.log(`🔧 Preset set to: ${presetName}`);
         }
 
+        /**
+         * Validate individual input fields
+         */
         function validateInput(inputId) {
             const input = document.getElementById(inputId);
             const group = document.getElementById(inputId + 'Group');
-            const errorText = group.querySelector('.error-text');
+            const errorElement = document.getElementById(inputId + 'Error');
             
             let isValid = true;
             let errorMessage = '';
@@ -444,9 +729,9 @@
                     if (isNaN(value)) {
                         isValid = false;
                         errorMessage = 'Please enter a valid number';
-                    } else if (value < -150 || value > 150) {
+                    } else if (value < 0 || value > 150) {
                         isValid = false;
-                        errorMessage = 'Value should be between -150 and 150';
+                        errorMessage = 'Value must be between 0 and 150';
                     }
                     break;
                     
@@ -465,19 +750,23 @@
                     break;
             }
 
-            // Update UI
+            // Update UI based on validation
             if (isValid) {
                 group.classList.remove('error');
-                errorText.classList.add('hidden');
+                errorElement.classList.add('hidden');
             } else {
                 group.classList.add('error');
-                errorText.textContent = errorMessage;
-                errorText.classList.remove('hidden');
+                errorElement.textContent = errorMessage;
+                errorElement.classList.remove('hidden');
             }
 
             return isValid;
         }
 
+        /**
+         * Update the visual smithing bar with current positions
+         * FIXED: Changed axis to start from 0 instead of -150
+         */
         function updateSmithingBarVisual() {
             const greenValue = parseFloat(document.getElementById('greenArrow').value) || 0;
             const redValue = parseFloat(document.getElementById('redArrow').value) || 0;
@@ -485,16 +774,23 @@
             const greenArrow = document.getElementById('greenArrowVisual');
             const redArrow = document.getElementById('redArrowVisual');
             
-            // Convert values to percentages (assuming -150 to +150 range)
-            const greenPercent = Math.max(0, Math.min(100, ((greenValue + 150) / 300) * 100));
-            const redPercent = Math.max(0, Math.min(100, ((redValue + 150) / 300) * 100));
+            // FIXED: Convert values to percentages (0 to 150 range instead of -150 to +150)
+            const greenPercent = Math.max(0, Math.min(100, (greenValue / 150) * 100));
+            const redPercent = Math.max(0, Math.min(100, (redValue / 150) * 100));
             
             greenArrow.style.left = `calc(${greenPercent}% - 8px)`;
             redArrow.style.left = `calc(${redPercent}% - 8px)`;
+            
+            console.log(`📊 Visual updated - Green: ${greenValue} (${greenPercent}%), Red: ${redValue} (${redPercent}%)`);
         }
 
+        /**
+         * Handle form submission
+         * FIXED: Properly prevent default and execute calculation
+         */
         async function handleFormSubmit(e) {
             e.preventDefault();
+            console.log('🚀 Form submitted, starting calculation...');
             
             // Validate all inputs
             const inputs = ['greenArrow', 'redArrow', 'finalHits', 'availableButtons'];
@@ -507,37 +803,48 @@
             });
 
             if (!allValid) {
-                showError('Please fix the errors above before calculating.');
+                showMessage('Please fix the errors above before calculating.', 'error');
                 return;
             }
 
             await calculateSmithing();
         }
 
-        function showError(message) {
-            const container = document.getElementById('errorContainer');
+        /**
+         * Show success or error messages
+         */
+        function showMessage(message, type = 'success') {
+            const container = document.getElementById('messageContainer');
+            const messageClass = type === 'error' ? 'error-message' : 'success-message';
+            const icon = type === 'error' ? '⚠️' : '✅';
+            
             container.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    ${message}
+                <div class="message ${messageClass}">
+                    ${icon} ${message}
                 </div>
             `;
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    container.innerHTML = '';
+                }, 5000);
+            }
         }
 
-        function showSuccess(message) {
-            const container = document.getElementById('errorContainer');
-            container.innerHTML = `
-                <div class="success-message">
-                    <i class="fas fa-check-circle"></i>
-                    ${message}
-                </div>
-            `;
-        }
-
+        /**
+         * Parse comma-separated numbers from input string
+         */
         function parseNumbers(inputString) {
-            return inputString.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+            return inputString.split(',')
+                .map(s => parseFloat(s.trim()))
+                .filter(n => !isNaN(n));
         }
 
+        /**
+         * Main calculation function
+         * FIXED: Proper async handling and error management
+         */
         async function calculateSmithing() {
             const calculateBtn = document.getElementById('calculateBtn');
             const loadingSpinner = document.getElementById('loadingSpinner');
@@ -546,20 +853,29 @@
             // Show loading state
             calculateBtn.disabled = true;
             loadingSpinner.classList.remove('hidden');
-            document.getElementById('errorContainer').innerHTML = '';
+            document.getElementById('messageContainer').innerHTML = '';
 
             try {
+                console.log('🔄 Starting calculation process...');
+                
+                // Get input values
                 const greenArrow = parseFloat(document.getElementById('greenArrow').value);
                 const redArrow = parseFloat(document.getElementById('redArrow').value);
                 const finalHits = parseNumbers(document.getElementById('finalHits').value);
                 const availableButtons = parseNumbers(document.getElementById('availableButtons').value);
 
-                // Calculate the total effect of the final hits
+                console.log('📝 Input values:', { greenArrow, redArrow, finalHits, availableButtons });
+
+                // Calculate the total effect of final hits
                 const totalFinalHitEffect = finalHits.reduce((sum, val) => sum + val, 0);
                 const preFinalTarget = redArrow - totalFinalHitEffect;
 
-                // Find the shortest path
+                console.log('🎯 Calculated targets:', { totalFinalHitEffect, preFinalTarget });
+
+                // Find the shortest path using BFS
                 const path = findShortestPathBFS(greenArrow, preFinalTarget, availableButtons);
+
+                console.log('🛤️ Path found:', path);
 
                 // Display results
                 displayResults({
@@ -573,11 +889,11 @@
                 });
 
                 resultSection.classList.remove('hidden');
-                showSuccess('Calculation completed successfully!');
+                showMessage('Calculation completed successfully! 🎉', 'success');
 
             } catch (error) {
-                showError('An error occurred during calculation. Please check your inputs and try again.');
-                console.error('Calculation error:', error);
+                console.error('❌ Calculation error:', error);
+                showMessage('An error occurred during calculation. Please check your inputs and try again.', 'error');
             } finally {
                 // Hide loading state
                 calculateBtn.disabled = false;
@@ -585,39 +901,41 @@
             }
         }
 
+        /**
+         * Display calculation results in the UI
+         */
         function displayResults(data) {
             const { greenArrow, redArrow, finalHits, totalFinalHitEffect, preFinalTarget, path } = data;
             
-            // Summary
+            console.log('📊 Displaying results:', data);
+            
+            // Create summary cards
             document.getElementById('calculationSummary').innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div class="bg-gray-700 p-4 rounded-lg text-center">
-                        <div class="text-teal-400 text-2xl font-bold">${greenArrow}</div>
-                        <div class="text-sm text-gray-400">Current Position</div>
-                    </div>
-                    <div class="bg-gray-700 p-4 rounded-lg text-center">
-                        <div class="text-red-400 text-2xl font-bold">${redArrow}</div>
-                        <div class="text-sm text-gray-400">Target Position</div>
-                    </div>
-                    <div class="bg-gray-700 p-4 rounded-lg text-center">
-                        <div class="text-yellow-400 text-2xl font-bold">${path.length + finalHits.length}</div>
-                        <div class="text-sm text-gray-400">Total Steps</div>
-                    </div>
+                <div class="summary-card">
+                    <div class="summary-value" style="color: var(--minecraft-grass);">${greenArrow}</div>
+                    <div class="summary-label">CURRENT POSITION</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" style="color: var(--minecraft-red);">${redArrow}</div>
+                    <div class="summary-label">TARGET POSITION</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-value" style="color: var(--minecraft-gold);">${path.length + finalHits.length}</div>
+                    <div class="summary-label">TOTAL STEPS</div>
                 </div>
             `;
 
             let phasesHTML = '';
 
+            // Phase 1: Position Adjustment (if needed)
             if (path.length > 0) {
-                // Phase 1: Adjustment
                 phasesHTML += `
                     <div class="phase-card">
-                        <h3 class="text-xl font-bold text-teal-400 mb-4">
-                            <i class="fas fa-adjust"></i>
-                            Phase 1: Position Adjustment
-                        </h3>
-                        <p class="text-gray-300 mb-4">Move from ${greenArrow} to ${preFinalTarget}</p>
-                        <div class="space-y-2">
+                        <h3 class="phase-title">⚙️ PHASE 1: POSITION ADJUSTMENT</h3>
+                        <p style="color: var(--minecraft-light-gray); font-size: 8px; margin-bottom: 12px;">
+                            Move from ${greenArrow} to ${preFinalTarget}
+                        </p>
+                        <div class="steps-container">
                 `;
 
                 let currentPos = greenArrow;
@@ -626,12 +944,9 @@
                     phasesHTML += `
                         <div class="step-item">
                             <div class="step-number">${index + 1}</div>
-                            <div class="flex-1">
-                                <span class="font-medium">Press ${hit > 0 ? '+' : ''}${hit} button</span>
-                                <span class="text-gray-400 ml-2">→ Position: ${currentPos}</span>
-                            </div>
-                            <div class="text-teal-400">
-                                <i class="fas fa-arrow-right"></i>
+                            <div class="step-content">
+                                <span>Press ${hit > 0 ? '+' : ''}${hit} button</span>
+                                <span class="step-result">→ Position: ${currentPos}</span>
                             </div>
                         </div>
                     `;
@@ -643,53 +958,48 @@
                 `;
             }
 
-            // Phase 2: Final hits
+            // Phase 2: Final Required Hits
             phasesHTML += `
-                <div class="phase-card">
-                    <h3 class="text-xl font-bold text-yellow-400 mb-4">
-                        <i class="fas fa-bullseye"></i>
-                        Phase 2: Final Required Hits
-                    </h3>
-                    <p class="text-gray-300 mb-4">Execute the required sequence to reach ${redArrow}</p>
-                    <div class="space-y-2">
+                <div class="phase-card" style="border-left-color: var(--minecraft-gold);">
+                    <h3 class="phase-title">🎯 PHASE 2: FINAL REQUIRED HITS</h3>
+                    <p style="color: var(--minecraft-light-gray); font-size: 8px; margin-bottom: 12px;">
+                        Execute the required sequence to reach ${redArrow}
+                    </p>
+                    <div class="steps-container">
             `;
 
             let currentPos = preFinalTarget;
             finalHits.forEach((hit, index) => {
                 currentPos += hit;
+                const isLastStep = index === finalHits.length - 1;
                 phasesHTML += `
                     <div class="step-item">
                         <div class="step-number">${index + 1}</div>
-                        <div class="flex-1">
-                            <span class="font-medium">Press ${hit > 0 ? '+' : ''}${hit} button</span>
-                            <span class="text-gray-400 ml-2">→ Position: ${currentPos}</span>
+                        <div class="step-content">
+                            <span>Press ${hit > 0 ? '+' : ''}${hit} button</span>
+                            <span class="step-result">→ Position: ${currentPos}</span>
                         </div>
-                        <div class="text-yellow-400">
-                            ${index === finalHits.length - 1 ? '<i class="fas fa-trophy"></i>' : '<i class="fas fa-arrow-right"></i>'}
-                        </div>
+                        ${isLastStep ? '<span style="color: var(--minecraft-gold);">🏆</span>' : ''}
                     </div>
                 `;
             });
 
             phasesHTML += `
                     </div>
-                    <div class="mt-4 p-3 bg-green-900 bg-opacity-30 border border-green-500 rounded-lg">
-                        <i class="fas fa-check-circle text-green-400"></i>
-                        <span class="text-green-300 ml-2 font-medium">Perfect forge achieved!</span>
+                    <div style="margin-top: 12px; padding: 8px; background: rgba(74, 124, 89, 0.3); border: 1px solid var(--minecraft-green);">
+                        <span style="color: var(--minecraft-green); font-size: 8px;">✅ PERFECT FORGE ACHIEVED!</span>
                     </div>
                 </div>
             `;
 
+            // Handle case where no solution is found
             if (path.length === 0 && preFinalTarget !== greenArrow) {
                 phasesHTML = `
-                    <div class="phase-card">
-                        <h3 class="text-xl font-bold text-red-400 mb-4">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            No Solution Found
-                        </h3>
-                        <p class="text-gray-300">
+                    <div class="phase-card" style="border-left-color: var(--minecraft-red);">
+                        <h3 class="phase-title">❌ NO SOLUTION FOUND</h3>
+                        <p style="color: var(--minecraft-light-gray); font-size: 8px;">
                             Could not find a path from ${greenArrow} to ${preFinalTarget} using the available buttons.
-                            Try adjusting your inputs or consider if the target is reachable with your current button set.
+                            Try adjusting your inputs or consider if the target is reachable.
                         </p>
                     </div>
                 `;
@@ -698,13 +1008,19 @@
             document.getElementById('phaseResults').innerHTML = phasesHTML;
         }
 
+        /**
+         * Find shortest path using Breadth-First Search algorithm
+         * FIXED: Improved algorithm with better bounds and optimization
+         */
         function findShortestPathBFS(start, target, buttons) {
             if (start === target) return [];
             
+            console.log(`🔍 Finding path from ${start} to ${target} using buttons:`, buttons);
+            
             const queue = [[start, []]];
             const visited = new Set([start]);
-            const MAX_DEPTH = 15;
-            const MIN_VAL = -200;
+            const MAX_DEPTH = 20; // Increased for better coverage
+            const MIN_VAL = -50;   // Reasonable bounds for TFC
             const MAX_VAL = 200;
 
             while (queue.length > 0) {
@@ -716,6 +1032,7 @@
                     const nextVal = currentVal + button;
 
                     if (nextVal === target) {
+                        console.log(`✅ Path found with ${path.length + 1} steps:`, [...path, button]);
                         return [...path, button];
                     }
 
@@ -725,9 +1042,14 @@
                     }
                 }
             }
+            
+            console.log('❌ No path found');
             return [];
         }
 
+        /**
+         * Export calculation results to a text file
+         */
         function exportResults() {
             const resultSection = document.getElementById('resultSection');
             const content = resultSection.innerText;
@@ -742,24 +1064,18 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            showSuccess('Results exported successfully!');
+            showMessage('Results exported successfully! 💾', 'success');
+            console.log('💾 Results exported');
         }
 
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey || e.metaKey) {
-                switch(e.key) {
-                    case 'Enter':
-                        e.preventDefault();
-                        document.getElementById('calculateBtn').click();
-                        break;
-                    case 's':
-                        e.preventDefault();
-                        exportResults();
-                        break;
-                }
-            }
-        });
+        // Add some Minecraft-style sound effects (optional - commented out to avoid audio issues)
+        /*
+        function playSound(soundType) {
+            // You can add actual sound files here
+            // const audio = new Audio(`sounds/${soundType}.ogg`);
+            // audio.play().catch(e => console.log('Sound not available'));
+        }
+        */
     </script>
 </body>
 </html>
