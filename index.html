@@ -5,162 +5,533 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TFC Smithing Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #1a202c; /* Dark background */
-            color: #e2e8f0; /* Light text */
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Align to top */
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            color: #e2e8f0;
             min-height: 100vh;
             padding: 20px;
             box-sizing: border-box;
         }
+        
         .container {
-            background-color: #2d3748; /* Darker container */
+            background: rgba(45, 55, 72, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(79, 209, 197, 0.2);
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
         }
-        h1 {
-            font-size: 2.25rem; /* text-4xl */
-            font-weight: bold;
-            color: #4fd1c5; /* Teal color for heading */
-            text-align: center;
+        
+        .smithing-bar {
+            background: linear-gradient(90deg, #e53e3e 0%, #fd7f28 25%, #ffd700 50%, #38a169 75%, #38a169 100%);
+            height: 20px;
+            border-radius: 10px;
+            position: relative;
+            margin: 20px 0;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .arrow {
+            position: absolute;
+            top: -8px;
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            transition: left 0.3s ease;
+        }
+        
+        .green-arrow {
+            border-bottom: 12px solid #4fd1c5;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        .red-arrow {
+            border-bottom: 12px solid #fc8181;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        .input-group {
+            background: rgba(26, 32, 44, 0.5);
+            padding: 20px;
+            border-radius: 12px;
             margin-bottom: 20px;
+            border: 1px solid rgba(74, 85, 104, 0.3);
+            transition: border-color 0.2s ease;
         }
+        
+        .input-group:hover {
+            border-color: rgba(79, 209, 197, 0.4);
+        }
+        
+        .input-group.error {
+            border-color: #fc8181;
+            background: rgba(252, 129, 129, 0.1);
+        }
+        
         label {
-            display: block;
-            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
             font-weight: 600;
-            color: #a0aec0; /* Light gray for labels */
+            color: #4fd1c5;
+            font-size: 1.1rem;
         }
-        input[type="number"],
-        input[type="text"],
-        textarea {
+        
+        input, textarea {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #4a5568; /* Darker border */
-            border-radius: 8px;
-            background-color: #2d3748; /* Same as container for seamless look */
+            padding: 14px 16px;
+            border: 2px solid #4a5568;
+            border-radius: 10px;
+            background: rgba(26, 32, 44, 0.8);
             color: #e2e8f0;
             font-size: 1rem;
-            box-sizing: border-box;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
+            font-family: inherit;
         }
-        input[type="number"]:focus,
-        input[type="text"]:focus,
-        textarea:focus {
+        
+        input:focus, textarea:focus {
             outline: none;
-            border-color: #4fd1c5; /* Teal on focus */
+            border-color: #4fd1c5;
+            box-shadow: 0 0 0 3px rgba(79, 209, 197, 0.1);
+            background: rgba(26, 32, 44, 1);
         }
-        button {
-            background-color: #4fd1c5; /* Teal button */
-            color: #1a202c; /* Dark text on button */
-            padding: 12px 20px;
+        
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .preset-btn {
+            background: rgba(79, 209, 197, 0.2);
+            color: #4fd1c5;
+            border: 1px solid #4fd1c5;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .preset-btn:hover {
+            background: rgba(79, 209, 197, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #4fd1c5 0%, #38b2ac 100%);
+            color: #1a202c;
+            padding: 16px 32px;
             border: none;
-            border-radius: 8px;
-            font-size: 1.125rem; /* text-lg */
+            border-radius: 12px;
+            font-size: 1.25rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(79, 209, 197, 0.3);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        button:hover {
-            background-color: #38b2ac; /* Darker teal on hover */
+        
+        .calculate-btn:hover:not(:disabled) {
             transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(79, 209, 197, 0.4);
         }
-        button:active {
-            transform: translateY(0);
+        
+        .calculate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
-        .input-group {
-            margin-bottom: 15px;
+        
+        .result-section {
+            background: rgba(26, 32, 44, 0.8);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 25px;
+            border: 1px solid rgba(79, 209, 197, 0.2);
         }
-        .result-area {
-            background-color: #1a202c; /* Even darker for results */
+        
+        .phase-card {
+            background: rgba(45, 55, 72, 0.6);
+            border-radius: 12px;
             padding: 20px;
-            border-radius: 10px;
-            min-height: 100px;
-            white-space: pre-wrap; /* Preserve whitespace and line breaks */
-            word-wrap: break-word; /* Break long words */
-            font-family: 'Courier New', monospace;
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #90cdf4; /* Light blue for results */
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
-            overflow-x: auto; /* Allow horizontal scrolling for long lines */
+            margin: 15px 0;
+            border-left: 4px solid #4fd1c5;
         }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(74, 85, 104, 0.3);
+        }
+        
+        .step-item:last-child {
+            border-bottom: none;
+        }
+        
+        .step-number {
+            background: #4fd1c5;
+            color: #1a202c;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.875rem;
+        }
+        
         .error-message {
-            color: #fc8181; /* Red for errors */
-            margin-top: 10px;
-            font-weight: 600;
+            background: rgba(252, 129, 129, 0.1);
+            border: 1px solid #fc8181;
+            color: #fc8181;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .loading-indicator {
-            text-align: center;
-            color: #4fd1c5;
-            font-style: italic;
-            margin-top: 10px;
+        
+        .success-message {
+            background: rgba(72, 187, 120, 0.1);
+            border: 1px solid #48bb78;
+            color: #48bb78;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(79, 209, 197, 0.3);
+            border-top: 3px solid #4fd1c5;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+        
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .preset-buttons {
+                justify-content: center;
+            }
+            
+            .calculate-btn {
+                font-size: 1.125rem;
+                padding: 14px 24px;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>TFC Smithing Calculator 🔨</h1>
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-teal-400 to-blue-400 bg-clip-text text-transparent mb-4">
+                <i class="fas fa-hammer mr-3"></i>
+                TFC Smithing Calculator
+            </h1>
+            <p class="text-gray-400 text-lg">Achieve perfectly forged items with precise anvil sequences</p>
+        </header>
 
+        <!-- Visual Smithing Bar -->
         <div class="input-group">
-            <label for="greenArrow">Current Green Arrow Position:</label>
-            <input type="number" id="greenArrow" placeholder="e.g., 60">
+            <label>
+                <i class="fas fa-chart-line"></i>
+                Smithing Progress Visualization
+            </label>
+            <div class="smithing-bar" id="smithingBar">
+                <div class="arrow green-arrow" id="greenArrowVisual"></div>
+                <div class="arrow red-arrow" id="redArrowVisual"></div>
+            </div>
+            <div class="flex justify-between text-sm text-gray-400 mt-2">
+                <span>-150</span>
+                <span>0</span>
+                <span>+150</span>
+            </div>
         </div>
 
-        <div class="input-group">
-            <label for="redArrow">Red Arrow (Final Target) Position:</label>
-            <input type="number" id="redArrow" placeholder="e.g., 55">
+        <form id="calculatorForm">
+            <div class="input-group" id="greenArrowGroup">
+                <label for="greenArrow">
+                    <i class="fas fa-location-arrow text-teal-400"></i>
+                    Current Green Arrow Position
+                    <i class="fas fa-question-circle tooltip text-sm" data-tooltip="Enter the current position of your green arrow on the smithing bar"></i>
+                </label>
+                <input type="number" id="greenArrow" placeholder="e.g., 60" step="any" required>
+                <div class="error-text hidden text-red-400 text-sm mt-2"></div>
+            </div>
+
+            <div class="input-group" id="redArrowGroup">
+                <label for="redArrow">
+                    <i class="fas fa-bullseye text-red-400"></i>
+                    Red Arrow (Final Target) Position
+                    <i class="fas fa-question-circle tooltip text-sm" data-tooltip="Enter the target position where the red arrow is pointing"></i>
+                </label>
+                <input type="number" id="redArrow" placeholder="e.g., 55" step="any" required>
+                <div class="error-text hidden text-red-400 text-sm mt-2"></div>
+            </div>
+
+            <div class="input-group" id="finalHitsGroup">
+                <label for="finalHits">
+                    <i class="fas fa-list-ol text-yellow-400"></i>
+                    Required Final Hits (Right to Left)
+                    <i class="fas fa-question-circle tooltip text-sm" data-tooltip="Enter the values from red-bordered slots, starting from rightmost"></i>
+                </label>
+                <textarea id="finalHits" rows="2" placeholder="e.g., -15, 2, 7 (for 3 hits) or 16, 2 (for 2 hits)" required></textarea>
+                <div class="error-text hidden text-red-400 text-sm mt-2"></div>
+                <small class="text-gray-400 block mt-2">
+                    <i class="fas fa-info-circle"></i>
+                    Enter numerical values from the red-bordered slots, separated by commas
+                </small>
+            </div>
+
+            <div class="input-group" id="availableButtonsGroup">
+                <label for="availableButtons">
+                    <i class="fas fa-th text-purple-400"></i>
+                    Available Anvil Buttons
+                    <i class="fas fa-question-circle tooltip text-sm" data-tooltip="All button values available on your anvil interface"></i>
+                </label>
+                <textarea id="availableButtons" rows="2" placeholder="Enter all available button values" required></textarea>
+                <div class="error-text hidden text-red-400 text-sm mt-2"></div>
+                <div class="preset-buttons">
+                    <button type="button" class="preset-btn" onclick="setPreset('default')">
+                        <i class="fas fa-cog"></i> Default TFC
+                    </button>
+                    <button type="button" class="preset-btn" onclick="setPreset('extended')">
+                        <i class="fas fa-plus"></i> Extended Set
+                    </button>
+                    <button type="button" class="preset-btn" onclick="setPreset('minimal')">
+                        <i class="fas fa-minus"></i> Minimal Set
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="calculate-btn" id="calculateBtn">
+                <i class="fas fa-calculator"></i>
+                <span>Calculate Smithing Steps</span>
+                <div class="loading-spinner hidden" id="loadingSpinner"></div>
+            </button>
+        </form>
+
+        <div id="resultSection" class="result-section hidden">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl font-bold text-teal-400">
+                    <i class="fas fa-route"></i>
+                    Calculation Results
+                </h2>
+                <button onclick="exportResults()" class="text-teal-400 hover:text-teal-300 transition-colors">
+                    <i class="fas fa-download"></i>
+                    Export
+                </button>
+            </div>
+            
+            <div id="calculationSummary" class="mb-6"></div>
+            <div id="phaseResults"></div>
         </div>
 
-        <div class="input-group">
-            <label for="finalHits">Required Final Hits (comma-separated, right to left):</label>
-            <textarea id="finalHits" rows="3" placeholder="e.g., -15, 2, 7 (for 3 hits) or 16, 2 (for 2 hits)"></textarea>
-            <small class="text-gray-400">Enter the numerical values for the hits in the red-bordered slots, from right to left.</small>
-        </div>
-
-        <div class="input-group">
-            <label for="availableButtons">All Available Anvil Buttons (comma-separated):</label>
-            <textarea id="availableButtons" rows="2" placeholder="e.g., 2, 7, 13, 16, -3, -6, -9, -15"></textarea>
-            <small class="text-gray-400">Enter all numbers on your anvil buttons, separated by commas.</small>
-        </div>
-
-        <button onclick="calculateSmithing()">Calculate Steps</button>
-
-        <div id="loading" class="loading-indicator hidden">Calculating...</div>
-        <div id="result" class="result-area"></div>
-        <div id="error" class="error-message hidden"></div>
+        <div id="errorContainer"></div>
     </div>
 
     <script>
+        // Preset configurations
+        const presets = {
+            default: '2, 7, 13, 16, -3, -6, -9, -15',
+            extended: '1, 2, 3, 7, 13, 16, -1, -2, -3, -6, -9, -15',
+            minimal: '7, 13, -6, -9'
+        };
+
+        // Initialize the app
         document.addEventListener('DOMContentLoaded', () => {
-            // Pre-fill with common values for convenience
-            document.getElementById('availableButtons').value = '2, 7, 13, 16, -3, -6, -9, -15';
+            setPreset('default');
+            setupEventListeners();
+            updateSmithingBarVisual();
         });
 
-        function showMessage(elementId, message, isError = false) {
-            const element = document.getElementById(elementId);
-            element.textContent = message;
-            element.classList.remove('hidden');
-            if (isError) {
-                element.classList.add('error-message');
-            } else {
-                element.classList.remove('error-message');
-            }
+        function setupEventListeners() {
+            const form = document.getElementById('calculatorForm');
+            const greenArrow = document.getElementById('greenArrow');
+            const redArrow = document.getElementById('redArrow');
+
+            form.addEventListener('submit', handleFormSubmit);
+            
+            // Real-time validation and visual updates
+            greenArrow.addEventListener('input', () => {
+                validateInput('greenArrow');
+                updateSmithingBarVisual();
+            });
+            
+            redArrow.addEventListener('input', () => {
+                validateInput('redArrow');
+                updateSmithingBarVisual();
+            });
+
+            // Validate other inputs
+            document.getElementById('finalHits').addEventListener('input', () => validateInput('finalHits'));
+            document.getElementById('availableButtons').addEventListener('input', () => validateInput('availableButtons'));
         }
 
-        function hideMessage(elementId) {
-            document.getElementById(elementId).classList.add('hidden');
+        function setPreset(presetName) {
+            document.getElementById('availableButtons').value = presets[presetName];
+            validateInput('availableButtons');
+            
+            // Visual feedback
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('bg-teal-500'));
+            event?.target.classList.add('bg-teal-500');
+        }
+
+        function validateInput(inputId) {
+            const input = document.getElementById(inputId);
+            const group = document.getElementById(inputId + 'Group');
+            const errorText = group.querySelector('.error-text');
+            
+            let isValid = true;
+            let errorMessage = '';
+
+            switch(inputId) {
+                case 'greenArrow':
+                case 'redArrow':
+                    const value = parseFloat(input.value);
+                    if (isNaN(value)) {
+                        isValid = false;
+                        errorMessage = 'Please enter a valid number';
+                    } else if (value < -150 || value > 150) {
+                        isValid = false;
+                        errorMessage = 'Value should be between -150 and 150';
+                    }
+                    break;
+                    
+                case 'finalHits':
+                case 'availableButtons':
+                    if (!input.value.trim()) {
+                        isValid = false;
+                        errorMessage = 'This field is required';
+                    } else {
+                        const numbers = parseNumbers(input.value);
+                        if (numbers.length === 0) {
+                            isValid = false;
+                            errorMessage = 'Please enter valid numbers separated by commas';
+                        }
+                    }
+                    break;
+            }
+
+            // Update UI
+            if (isValid) {
+                group.classList.remove('error');
+                errorText.classList.add('hidden');
+            } else {
+                group.classList.add('error');
+                errorText.textContent = errorMessage;
+                errorText.classList.remove('hidden');
+            }
+
+            return isValid;
+        }
+
+        function updateSmithingBarVisual() {
+            const greenValue = parseFloat(document.getElementById('greenArrow').value) || 0;
+            const redValue = parseFloat(document.getElementById('redArrow').value) || 0;
+            
+            const greenArrow = document.getElementById('greenArrowVisual');
+            const redArrow = document.getElementById('redArrowVisual');
+            
+            // Convert values to percentages (assuming -150 to +150 range)
+            const greenPercent = Math.max(0, Math.min(100, ((greenValue + 150) / 300) * 100));
+            const redPercent = Math.max(0, Math.min(100, ((redValue + 150) / 300) * 100));
+            
+            greenArrow.style.left = `calc(${greenPercent}% - 8px)`;
+            redArrow.style.left = `calc(${redPercent}% - 8px)`;
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Validate all inputs
+            const inputs = ['greenArrow', 'redArrow', 'finalHits', 'availableButtons'];
+            let allValid = true;
+            
+            inputs.forEach(inputId => {
+                if (!validateInput(inputId)) {
+                    allValid = false;
+                }
+            });
+
+            if (!allValid) {
+                showError('Please fix the errors above before calculating.');
+                return;
+            }
+
+            await calculateSmithing();
+        }
+
+        function showError(message) {
+            const container = document.getElementById('errorContainer');
+            container.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ${message}
+                </div>
+            `;
+        }
+
+        function showSuccess(message) {
+            const container = document.getElementById('errorContainer');
+            container.innerHTML = `
+                <div class="success-message">
+                    <i class="fas fa-check-circle"></i>
+                    ${message}
+                </div>
+            `;
         }
 
         function parseNumbers(inputString) {
@@ -168,104 +539,227 @@
         }
 
         async function calculateSmithing() {
-            hideMessage('result');
-            hideMessage('error');
-            showMessage('loading', 'Calculating...', false);
+            const calculateBtn = document.getElementById('calculateBtn');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const resultSection = document.getElementById('resultSection');
+            
+            // Show loading state
+            calculateBtn.disabled = true;
+            loadingSpinner.classList.remove('hidden');
+            document.getElementById('errorContainer').innerHTML = '';
 
-            const greenArrow = parseFloat(document.getElementById('greenArrow').value);
-            const redArrow = parseFloat(document.getElementById('redArrow').value);
-            const finalHitsInput = document.getElementById('finalHits').value;
-            const availableButtonsInput = document.getElementById('availableButtons').value;
+            try {
+                const greenArrow = parseFloat(document.getElementById('greenArrow').value);
+                const redArrow = parseFloat(document.getElementById('redArrow').value);
+                const finalHits = parseNumbers(document.getElementById('finalHits').value);
+                const availableButtons = parseNumbers(document.getElementById('availableButtons').value);
 
-            if (isNaN(greenArrow) || isNaN(redArrow) || !finalHitsInput || !availableButtonsInput) {
-                showMessage('error', 'Please fill in all fields with valid numbers.', true);
-                hideMessage('loading');
-                return;
-            }
+                // Calculate the total effect of the final hits
+                const totalFinalHitEffect = finalHits.reduce((sum, val) => sum + val, 0);
+                const preFinalTarget = redArrow - totalFinalHitEffect;
 
-            const finalHits = parseNumbers(finalHitsInput);
-            const availableButtons = parseNumbers(availableButtonsInput);
+                // Find the shortest path
+                const path = findShortestPathBFS(greenArrow, preFinalTarget, availableButtons);
 
-            if (finalHits.length === 0 || availableButtons.length === 0) {
-                showMessage('error', 'Please enter valid numerical values for hits and buttons.', true);
-                hideMessage('loading');
-                return;
-            }
-
-            // Calculate the total effect of the final hits
-            const totalFinalHitEffect = finalHits.reduce((sum, val) => sum + val, 0);
-
-            // Calculate the pre-final target value
-            const preFinalTarget = redArrow - totalFinalHitEffect;
-
-            let resultText = `Current Green Arrow: ${greenArrow}\n`;
-            resultText += `Red Arrow Target: ${redArrow}\n`;
-            resultText += `Required Final Hits (right to left): ${finalHits.join(', ')}\n`;
-            resultText += `Total effect of final hits: ${totalFinalHitEffect}\n`;
-            resultText += `Pre-final target value (before final hits): ${preFinalTarget}\n\n`;
-
-            // Use BFS to find the shortest path from current green arrow to pre-final target
-            const path = findShortestPathBFS(greenArrow, preFinalTarget, availableButtons);
-
-            if (path.length > 0) {
-                resultText += "--- Phase 1: Adjusting Green Arrow ---\n";
-                resultText += `To get from ${greenArrow} to ${preFinalTarget}, press these buttons:\n`;
-                path.forEach((hit, index) => {
-                    resultText += `${index + 1}. Press the ${hit > 0 ? '+' : ''}${hit} button.\n`;
+                // Display results
+                displayResults({
+                    greenArrow,
+                    redArrow,
+                    finalHits,
+                    totalFinalHitEffect,
+                    preFinalTarget,
+                    path,
+                    availableButtons
                 });
-                resultText += `(Your green arrow should now be at ${preFinalTarget})\n\n`;
 
-                resultText += "--- Phase 2: Performing Final Required Hits ---\n";
-                resultText += `Once at ${preFinalTarget}, perform these hits in order (right to left as per red slots):\n`;
-                let currentVal = preFinalTarget;
-                finalHits.forEach((hit, index) => {
-                    resultText += `${index + 1}. Press the ${hit > 0 ? '+' : ''}${hit} button.\n`;
-                    currentVal += hit;
-                });
-                resultText += `(Your green arrow should now be at ${currentVal}, perfectly on the Red Arrow!)\n`;
-            } else {
-                resultText += "Could not find a path to reach the pre-final target using the available buttons. Try adjusting your inputs or if the range is too large, it might be unreachable with these buttons.\n";
+                resultSection.classList.remove('hidden');
+                showSuccess('Calculation completed successfully!');
+
+            } catch (error) {
+                showError('An error occurred during calculation. Please check your inputs and try again.');
+                console.error('Calculation error:', error);
+            } finally {
+                // Hide loading state
+                calculateBtn.disabled = false;
+                loadingSpinner.classList.add('hidden');
             }
-
-            showMessage('result', resultText);
-            hideMessage('loading');
         }
 
-        // BFS implementation to find shortest path
-        function findShortestPathBFS(start, target, buttons) {
-            const queue = [[start, []]]; // [current_value, path_taken]
-            const visited = new Set();
-            visited.add(start);
+        function displayResults(data) {
+            const { greenArrow, redArrow, finalHits, totalFinalHitEffect, preFinalTarget, path } = data;
+            
+            // Summary
+            document.getElementById('calculationSummary').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="bg-gray-700 p-4 rounded-lg text-center">
+                        <div class="text-teal-400 text-2xl font-bold">${greenArrow}</div>
+                        <div class="text-sm text-gray-400">Current Position</div>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-lg text-center">
+                        <div class="text-red-400 text-2xl font-bold">${redArrow}</div>
+                        <div class="text-sm text-gray-400">Target Position</div>
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-lg text-center">
+                        <div class="text-yellow-400 text-2xl font-bold">${path.length + finalHits.length}</div>
+                        <div class="text-sm text-gray-400">Total Steps</div>
+                    </div>
+                </div>
+            `;
 
-            // Limit search range to prevent infinite loops or excessively long calculations
-            // TFC values usually stay within a reasonable range.
-            const MIN_VAL = -1000; // Arbitrary lower bound
-            const MAX_VAL = 1000; // Arbitrary upper bound
-            const MAX_DEPTH = 10; // Max number of presses to search
+            let phasesHTML = '';
+
+            if (path.length > 0) {
+                // Phase 1: Adjustment
+                phasesHTML += `
+                    <div class="phase-card">
+                        <h3 class="text-xl font-bold text-teal-400 mb-4">
+                            <i class="fas fa-adjust"></i>
+                            Phase 1: Position Adjustment
+                        </h3>
+                        <p class="text-gray-300 mb-4">Move from ${greenArrow} to ${preFinalTarget}</p>
+                        <div class="space-y-2">
+                `;
+
+                let currentPos = greenArrow;
+                path.forEach((hit, index) => {
+                    currentPos += hit;
+                    phasesHTML += `
+                        <div class="step-item">
+                            <div class="step-number">${index + 1}</div>
+                            <div class="flex-1">
+                                <span class="font-medium">Press ${hit > 0 ? '+' : ''}${hit} button</span>
+                                <span class="text-gray-400 ml-2">→ Position: ${currentPos}</span>
+                            </div>
+                            <div class="text-teal-400">
+                                <i class="fas fa-arrow-right"></i>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                phasesHTML += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Phase 2: Final hits
+            phasesHTML += `
+                <div class="phase-card">
+                    <h3 class="text-xl font-bold text-yellow-400 mb-4">
+                        <i class="fas fa-bullseye"></i>
+                        Phase 2: Final Required Hits
+                    </h3>
+                    <p class="text-gray-300 mb-4">Execute the required sequence to reach ${redArrow}</p>
+                    <div class="space-y-2">
+            `;
+
+            let currentPos = preFinalTarget;
+            finalHits.forEach((hit, index) => {
+                currentPos += hit;
+                phasesHTML += `
+                    <div class="step-item">
+                        <div class="step-number">${index + 1}</div>
+                        <div class="flex-1">
+                            <span class="font-medium">Press ${hit > 0 ? '+' : ''}${hit} button</span>
+                            <span class="text-gray-400 ml-2">→ Position: ${currentPos}</span>
+                        </div>
+                        <div class="text-yellow-400">
+                            ${index === finalHits.length - 1 ? '<i class="fas fa-trophy"></i>' : '<i class="fas fa-arrow-right"></i>'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            phasesHTML += `
+                    </div>
+                    <div class="mt-4 p-3 bg-green-900 bg-opacity-30 border border-green-500 rounded-lg">
+                        <i class="fas fa-check-circle text-green-400"></i>
+                        <span class="text-green-300 ml-2 font-medium">Perfect forge achieved!</span>
+                    </div>
+                </div>
+            `;
+
+            if (path.length === 0 && preFinalTarget !== greenArrow) {
+                phasesHTML = `
+                    <div class="phase-card">
+                        <h3 class="text-xl font-bold text-red-400 mb-4">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            No Solution Found
+                        </h3>
+                        <p class="text-gray-300">
+                            Could not find a path from ${greenArrow} to ${preFinalTarget} using the available buttons.
+                            Try adjusting your inputs or consider if the target is reachable with your current button set.
+                        </p>
+                    </div>
+                `;
+            }
+
+            document.getElementById('phaseResults').innerHTML = phasesHTML;
+        }
+
+        function findShortestPathBFS(start, target, buttons) {
+            if (start === target) return [];
+            
+            const queue = [[start, []]];
+            const visited = new Set([start]);
+            const MAX_DEPTH = 15;
+            const MIN_VAL = -200;
+            const MAX_VAL = 200;
 
             while (queue.length > 0) {
                 const [currentVal, path] = queue.shift();
 
-                if (currentVal === target) {
-                    return path; // Found the shortest path
-                }
-
-                if (path.length >= MAX_DEPTH) {
-                    continue; // Too deep, stop exploring this path
-                }
+                if (path.length >= MAX_DEPTH) continue;
 
                 for (const button of buttons) {
                     const nextVal = currentVal + button;
 
-                    // Check if within reasonable bounds and not visited
+                    if (nextVal === target) {
+                        return [...path, button];
+                    }
+
                     if (nextVal >= MIN_VAL && nextVal <= MAX_VAL && !visited.has(nextVal)) {
                         visited.add(nextVal);
                         queue.push([nextVal, [...path, button]]);
                     }
                 }
             }
-            return []; // No path found
+            return [];
         }
+
+        function exportResults() {
+            const resultSection = document.getElementById('resultSection');
+            const content = resultSection.innerText;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'tfc-smithing-calculation.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showSuccess('Results exported successfully!');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'Enter':
+                        e.preventDefault();
+                        document.getElementById('calculateBtn').click();
+                        break;
+                    case 's':
+                        e.preventDefault();
+                        exportResults();
+                        break;
+                }
+            }
+        });
     </script>
 </body>
 </html>
